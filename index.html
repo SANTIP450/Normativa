@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carteras FCI — 12/06/2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d12;--s1:#13161f;--s2:#1a1e2a;--s3:#222636;
+  --border:#252a3a;--border2:#2e3448;
+  --gold:#c9a84c;--gold2:#8a6f2e;
+  --green:#3ecf8e;--red:#f26969;--blue:#5b9cf6;
+  --purple:#a78bfa;--orange:#fb923c;--cyan:#22d3ee;
+  --yellow:#fbbf24;--pink:#f472b6;
+  --text:#e2e8f0;--dim:#8892a4;--muted:#4a5568;
+}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px}
+
+/* HEADER */
+.hdr{background:var(--s1);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-l{display:flex;align-items:center;gap:16px}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--gold);letter-spacing:-0.5px}
+.logo em{font-style:normal;color:var(--dim);font-weight:400;font-size:11px;margin-left:8px}
+.badge{background:rgba(201,168,76,.12);border:1px solid var(--gold2);color:var(--gold);padding:2px 9px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.5px}
+.hdr-r{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-align:right;line-height:1.7}
+
+/* KPIs */
+.kpi-bar{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:16px 28px;border-bottom:1px solid var(--border)}
+.kpi{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--acc,var(--gold));padding:12px 14px;border-radius:3px}
+.kpi-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:5px}
+.kpi-v{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:var(--acc,var(--gold));line-height:1}
+.kpi-s{font-size:9px;color:var(--muted);margin-top:3px}
+
+/* MAIN TABS */
+.main-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);padding:0 28px;background:var(--s1);position:sticky;top:52px;z-index:100;overflow-x:auto}
+.mt-btn{padding:11px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;white-space:nowrap;letter-spacing:.3px}
+.mt-btn:hover{color:var(--dim)}
+.mt-btn.on{color:var(--acc,var(--gold));border-bottom-color:var(--acc,var(--gold))}
+.tab-section{display:none;padding:20px 28px}
+.tab-section.on{display:block}
+
+/* FUND SELECTOR inside a tipo */
+.fund-selector{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.fs-btn{padding:6px 14px;font-size:11px;font-family:'IBM Plex Mono',monospace;border:1px solid var(--border);background:var(--s2);color:var(--dim);border-radius:3px;cursor:pointer;transition:.15s;letter-spacing:.3px}
+.fs-btn:hover{border-color:var(--dim);color:var(--text)}
+.fs-btn.on{background:var(--acc-bg,rgba(201,168,76,.12));border-color:var(--acc,var(--gold));color:var(--acc,var(--gold))}
+.fs-btn .amt{font-size:9px;display:block;color:var(--muted);margin-top:1px}
+
+/* FUND DETAIL */
+.fund-detail{display:none}
+.fund-detail.on{display:block}
+.fd-header{background:var(--s2);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.fd-name{font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px}
+.fd-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fd-total{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:var(--acc,var(--gold))}
+.fd-pct-total{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* COMPOSITION BAR */
+.comp-bar-wrap{margin-bottom:14px}
+.comp-bar{height:28px;border-radius:3px;overflow:hidden;display:flex;background:var(--bg)}
+.comp-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.75);overflow:hidden;white-space:nowrap;transition:.3s;cursor:default}
+.comp-seg:hover{opacity:.85}
+.comp-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--dim)}
+.cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* HOLDINGS TABLE */
+.panel{background:var(--s1);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.panel-hdr{background:var(--s2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.5px}
+.panel-hdr .ph-title{color:var(--text);font-weight:500;font-size:11px}
+.panel-hdr .ph-sub{color:var(--muted)}
+
+.holdings-tbl{width:100%;border-collapse:collapse}
+.holdings-tbl th{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 14px;border-bottom:1px solid var(--border);background:var(--s2)}
+.holdings-tbl th:not(:first-child){text-align:right}
+.holdings-tbl td{padding:7px 14px;border-bottom:1px solid rgba(37,42,58,.5);font-size:11px;vertical-align:middle}
+.holdings-tbl td:not(:first-child){font-family:'IBM Plex Mono',monospace;text-align:right}
+.holdings-tbl tr:hover td{background:rgba(255,255,255,.02)}
+.holdings-tbl tr:last-child td{border-bottom:none}
+
+.td-main{color:var(--text);font-weight:500}
+.td-sub{color:var(--muted);font-size:9px;margin-top:1px}
+.neg{color:var(--red)!important}
+
+/* MINI BAR */
+.mini-bar-wrap{width:100%;display:flex;align-items:center;gap:8px}
+.mini-bar-track{flex:1;height:6px;background:var(--bg);border-radius:2px;overflow:hidden;min-width:40px}
+.mini-bar-fill{height:100%;border-radius:2px}
+.mini-bar-val{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text);width:45px;text-align:right;flex-shrink:0}
+
+/* CHIPS */
+.chip{display:inline-block;padding:2px 7px;border-radius:2px;font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.3px;white-space:nowrap}
+.c-mm-ars{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+.c-mm-usd{background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.25)}
+.c-cer{background:rgba(62,207,142,.12);color:var(--green);border:1px solid rgba(62,207,142,.25)}
+.c-lecap{background:rgba(91,156,246,.12);color:var(--blue);border:1px solid rgba(91,156,246,.25)}
+.c-usd{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.25)}
+.c-mult{background:rgba(34,211,238,.08);color:#67e8f9;border:1px solid rgba(34,211,238,.2)}
+.c-rv{background:rgba(251,146,60,.12);color:var(--orange);border:1px solid rgba(251,146,60,.25)}
+.c-rm{background:rgba(167,139,250,.08);color:#c4b5fd;border:1px solid rgba(167,139,250,.2)}
+.c-pyme{background:rgba(242,105,105,.12);color:var(--red);border:1px solid rgba(242,105,105,.25)}
+.c-infra{background:rgba(251,146,60,.08);color:#fdba74;border:1px solid rgba(251,146,60,.2)}
+.c-arg{background:rgba(62,207,142,.08);color:#6ee7b7;border:1px solid rgba(62,207,142,.2)}
+
+.sub-chip{display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;font-family:'IBM Plex Mono',monospace;background:var(--s3);color:var(--dim);border:1px solid var(--border);white-space:nowrap}
+.mon-ars{color:var(--gold)!important}
+.mon-usd{color:var(--cyan)!important}
+.mon-mix{color:var(--purple)!important}
+
+/* OVERVIEW TABLE */
+.overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.ov-stacked{height:16px;border-radius:2px;overflow:hidden;display:flex;margin-top:5px}
+.ov-seg{height:100%}
+
+footer{border-top:1px solid var(--border);padding:14px 28px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.5px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="logo">FCI Carteras <em>Detalle al 12/06/2026</em></div>
+    <div class="badge">21 FONDOS</div>
+  </div>
+  <div class="hdr-r">ARS 4.272T patrimonio total<br>Fuente: CAFCI / CNV</div>
+</div>
+
+<div class="kpi-bar">
+  <div class="kpi" style="--acc:var(--gold)"><div class="kpi-l">Total AUM</div><div class="kpi-v">$4.272T</div><div class="kpi-s">21 fondos</div></div>
+  <div class="kpi" style="--acc:var(--gold)"><div class="kpi-l">Money Market</div><div class="kpi-v">$3.205T</div><div class="kpi-s">3 fondos · 75%</div></div>
+  <div class="kpi" style="--acc:var(--blue)"><div class="kpi-l">RF ARS (Lecap)</div><div class="kpi-v">$276B</div><div class="kpi-s">3 fondos · 6.5%</div></div>
+  <div class="kpi" style="--acc:var(--cyan)"><div class="kpi-l">RF MULT (T+1)</div><div class="kpi-v">$330B</div><div class="kpi-s">3 fondos · 7.7%</div></div>
+  <div class="kpi" style="--acc:var(--green)"><div class="kpi-l">RF ARS (CER)</div><div class="kpi-v">$94B</div><div class="kpi-s">2 fondos · 2.2%</div></div>
+  <div class="kpi" style="--acc:var(--purple)"><div class="kpi-l">RF USD</div><div class="kpi-v">$173B</div><div class="kpi-s">5 fondos · 4.1%</div></div>
+  <div class="kpi" style="--acc:var(--orange)"><div class="kpi-l">RV + RM + Otros</div><div class="kpi-v">$166B</div><div class="kpi-s">7 fondos · 3.9%</div></div>
+</div>
+
+<div class="main-tabs">
+  <button class="mt-btn on" style="--acc:var(--gold)" onclick="switchMain(this,'t-mm')">💰 Money Market</button>
+  <button class="mt-btn" style="--acc:var(--blue)" onclick="switchMain(this,'t-lecap')">📄 RF ARS Lecap</button>
+  <button class="mt-btn" style="--acc:var(--green)" onclick="switchMain(this,'t-cer')">📊 RF ARS CER</button>
+  <button class="mt-btn" style="--acc:var(--cyan)" onclick="switchMain(this,'t-mult')">🔗 RF MULT / T+1</button>
+  <button class="mt-btn" style="--acc:var(--purple)" onclick="switchMain(this,'t-rfusd')">💵 RF USD</button>
+  <button class="mt-btn" style="--acc:var(--orange)" onclick="switchMain(this,'t-rv')">📈 Renta Variable</button>
+  <button class="mt-btn" style="--acc:var(--pink)" onclick="switchMain(this,'t-rm')">⚡ Renta Mixta</button>
+  <button class="mt-btn" style="--acc:var(--red)" onclick="switchMain(this,'t-pyme')">🏭 PyMEs</button>
+  <button class="mt-btn" style="--acc:#facc15" onclick="switchMain(this,'t-rofex')">⚙️ Rofex DLR</button>
+  <button class="mt-btn" style="--acc:#fdba74" onclick="switchMain(this,'t-infra')">🔧 Infraestructura</button>
+</div>
+
+<!-- ══ MONEY MARKET ══ -->
+<div id="t-mm" class="tab-section on">
+  <div class="fund-selector" id="fs-mm"></div>
+  <div id="fd-mm"></div>
+</div>
+
+<!-- ══ RF ARS LECAP ══ -->
+<div id="t-lecap" class="tab-section">
+  <div class="fund-selector" id="fs-lecap"></div>
+  <div id="fd-lecap"></div>
+</div>
+
+<!-- ══ RF ARS CER ══ -->
+<div id="t-cer" class="tab-section">
+  <div class="fund-selector" id="fs-cer"></div>
+  <div id="fd-cer"></div>
+</div>
+
+<!-- ══ RF MULT ══ -->
+<div id="t-mult" class="tab-section">
+  <div class="fund-selector" id="fs-mult"></div>
+  <div id="fd-mult"></div>
+</div>
+
+<!-- ══ RF USD ══ -->
+<div id="t-rfusd" class="tab-section">
+  <div class="fund-selector" id="fs-rfusd"></div>
+  <div id="fd-rfusd"></div>
+</div>
+
+<!-- ══ RV ══ -->
+<div id="t-rv" class="tab-section">
+  <div class="fund-selector" id="fs-rv"></div>
+  <div id="fd-rv"></div>
+</div>
+
+<!-- ══ RM ══ -->
+<div id="t-rm" class="tab-section">
+  <div class="fund-selector" id="fs-rm"></div>
+  <div id="fd-rm"></div>
+</div>
+
+<!-- ══ PYME ══ -->
+<div id="t-pyme" class="tab-section">
+  <div class="fund-selector" id="fs-pyme"></div>
+  <div id="fd-pyme"></div>
+</div>
+
+<!-- ══ ROFEX ══ -->
+<div id="t-rofex" class="tab-section">
+  <div id="rofex-content"></div>
+</div>
+
+<!-- ══ INFRA ══ -->
+<div id="t-infra" class="tab-section">
+  <div class="fund-selector" id="fs-infra"></div>
+  <div id="fd-infra"></div>
+</div>
+
+<footer>Dashboard FCI · 12/06/2026 · Fuente: CAFCI / CNV · En millones de ARS</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const TOTAL_AUM = 4272000; // M
+
+const FUNDS = [
+  // MONEY MARKET
+  {
+    name:'1822 Raíces Ahorro Pesos', tipo:'MM ARS Clásico', tab:'mm', acc:'var(--gold)', chipCls:'c-mm-ars',
+    total:1695502, moneda:'ARS',
+    by_clase:{'Disponibilidades':114365,'Operaciones a Plazo':1183796,'Otros A/P':397341},
+    holdings:[
+      {a:'Pzo Fi $ Bco Patagonia',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:145916,p:8.61},
+      {a:'Pzo Fi $ Bco Credicoop',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:141721,p:8.36},
+      {a:'Pzo Fi $ Bco Macro',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:129837,p:7.66},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:120000,p:7.08},
+      {a:'Pzo Fi $ Bco Nacion',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:110352,p:6.51},
+      {a:'Pzo Fi $ ICBC',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:87961,p:5.19},
+      {a:'Pzo Fi $ Bco BBVA',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:86348,p:5.09},
+      {a:'Pzo Fi $ Bco Santander',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:75481,p:4.45},
+      {a:'Cta Cte $ Bco Prov BA',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:72365,p:4.27},
+      {a:'Pzo Fi $ Bco Supervielle',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:61376,p:3.62},
+      {a:'Pzo Fi $ Bco Valores',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:46643,p:2.75},
+      {a:'Pzo Fi $ Nvo Bco Indus',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:38033,p:2.24},
+      {a:'Pzo Fi $ Bco Hipotecario',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:36108,p:2.13},
+      {a:'Caucion Colocadora $ MAE',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:30000,p:1.77},
+      {a:'Pzo Fi $ Bco Comafi',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:15352,p:0.91},
+      {a:'Pzo Fi $ Nvo Bco Chaco',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:11701,p:0.69},
+      {a:'Pzo Fi $ Bco Rioja',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:11257,p:0.66},
+      {a:'Pzo Fi $ Bco Galicia',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:10197,p:0.60},
+      {a:'Cta Cte $ Rem Bco Chaco',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:10000,p:0.59},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:10834,p:0.64},
+    ]
+  },
+  {
+    name:'1810 Ahorro', tipo:'MM ARS Clásico', tab:'mm', acc:'var(--gold)', chipCls:'c-mm-ars',
+    total:1491109, moneda:'ARS',
+    by_clase:{'Disponibilidades':440134,'Operaciones a Plazo':1050722,'Otros A/P':253},
+    holdings:[
+      {a:'Cta Cte $ Rem Bco Credicoop',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:314128,p:21.07},
+      {a:'Pzo Fi $ Bco Nacion',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:263351,p:17.66},
+      {a:'Pzo Fi $ Bco Santander',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:227305,p:15.24},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:125623,p:8.42},
+      {a:'Pzo Fi $ Bco Cordoba',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:121101,p:8.12},
+      {a:'Pzo Fi $ Bco Galicia',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:120881,p:8.11},
+      {a:'Pzo Fi $ ICBC',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:86166,p:5.78},
+      {a:'Cta Cte $ Rem Bco Prov BA',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:50000,p:3.35},
+      {a:'Caucion Colocadora $ Merval',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:50000,p:3.35},
+      {a:'Pzo Fi $ Bco Provincia',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:25504,p:1.71},
+      {a:'Cta Cte $ Rem Bco Santander',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:21000,p:1.41},
+      {a:'Cta Cte $ Rem Bco Supervielle',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:21000,p:1.41},
+      {a:'Pzo Fi $ Bco Supervielle',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:20024,p:1.34},
+      {a:'Cta Cte $ Rem ICBC',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:16000,p:1.07},
+      {a:'Cta Cte $ Rem Bco Galicia',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:11000,p:0.74},
+      {a:'Pzo Fi $ Nvo Bco Indus',cl:'Op. Plazo',sub:'Plazo Fijo',m:'ARS',v:10767,p:0.72},
+      {a:'Cta Cte $ Rem Bco Hipotec',cl:'Disponib.',sub:'Cta Corriente',m:'ARS',v:6000,p:0.40},
+      {a:'Otros A/P',cl:'Otros',sub:'',m:'',v:253,p:0.02},
+    ]
+  },
+  {
+    name:'1822 Raíces Ahorro Dólares', tipo:'MM USD Clásico', tab:'mm', acc:'var(--cyan)', chipCls:'c-mm-usd',
+    total:18659, moneda:'USD',
+    by_clase:{'Disponibilidades':3794,'Operaciones a Plazo':11280,'Títulos de Deuda':3585},
+    holdings:[
+      {a:'Caucion Colocadora U$S BYMA',cl:'Op. Plazo',sub:'Caución',m:'USD',v:3695,p:19.80},
+      {a:'Pzo Fi U$S Bco Comafi',cl:'Op. Plazo',sub:'Plazo Fijo',m:'USD',v:2809,p:15.06},
+      {a:'Pzo Fi U$S Bco Galicia',cl:'Op. Plazo',sub:'Plazo Fijo',m:'USD',v:2617,p:14.03},
+      {a:'Cta Cte U$S Rem Bco Industrial',cl:'Disponib.',sub:'Cta Corriente',m:'USD',v:2365,p:12.68},
+      {a:'Pzo Fi U$S Bco Patagonia',cl:'Op. Plazo',sub:'Plazo Fijo',m:'USD',v:1330,p:7.13},
+      {a:'Cta Cte U$S Rem Bco Galicia',cl:'Disponib.',sub:'Cta Corriente',m:'USD',v:828,p:4.44},
+      {a:'ON Arcor C2 7.6%',cl:'Tít. Deuda',sub:'ON',m:'USD',v:750,p:4.02},
+      {a:'ON Supervielle Clase V',cl:'Tít. Deuda',sub:'ON',m:'USD',v:742,p:3.97},
+      {a:'ON BBVA Frances Cl 45',cl:'Tít. Deuda',sub:'ON',m:'USD',v:741,p:3.97},
+      {a:'ON ICBC Clase 6',cl:'Tít. Deuda',sub:'ON',m:'USD',v:741,p:3.97},
+      {a:'ON Vista Energy 30',cl:'Tít. Deuda',sub:'ON',m:'USD',v:612,p:3.28},
+      {a:'Cta Cte U$S Rem Bco CMF',cl:'Disponib.',sub:'Cta Corriente',m:'USD',v:591,p:3.17},
+      {a:'Pzo Fi U$S Bco Supervielle',cl:'Op. Plazo',sub:'Plazo Fijo',m:'USD',v:459,p:2.46},
+      {a:'Pzo Fi U$S Bco Hipot',cl:'Op. Plazo',sub:'Plazo Fijo',m:'USD',v:370,p:1.98},
+    ]
+  },
+  // RF ARS LECAP
+  {
+    name:'1810 Más Ahorro', tipo:'RF ARS Lecap', tab:'lecap', acc:'var(--blue)', chipCls:'c-lecap',
+    total:185774, moneda:'ARS',
+    by_clase:{'Disponibilidades':10,'Operaciones a Plazo':4133,'Títulos de Deuda':181631},
+    holdings:[
+      {a:'Lecap S30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:49388,p:27.21},
+      {a:'Lecap S17L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:47494,p:26.17},
+      {a:'Lecap S15S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:45916,p:25.30},
+      {a:'Lecap S14G6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:25576,p:14.09},
+      {a:'Lecer X31L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:6892,p:3.80},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:4133,p:2.28},
+      {a:'Bono Prov Buenos Aires PBM27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2146,p:1.18},
+      {a:'Letras Prov Buenos Aires LBL26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1467,p:0.81},
+      {a:'Letra Prov Bs As PBA27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1126,p:0.62},
+      {a:'ON Rowing S1',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:833,p:0.46},
+      {a:'Lecap T30J6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:790,p:0.44},
+      {a:'ON Carsa Serie 9 Clase B',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:4,p:0.00},
+    ]
+  },
+  {
+    name:'1822 Raíces Renta en Pesos', tipo:'RF ARS Lecap', tab:'lecap', acc:'var(--blue)', chipCls:'c-lecap',
+    total:65924, moneda:'ARS',
+    by_clase:{'Derivados':5470,'Disponibilidades':0,'Op. a Plazo':2000,'Títulos de Deuda':52172,'VIC':6282},
+    holdings:[
+      {a:'Lelink D30S6 (Dollar-Linked)',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:5095,p:8.45},
+      {a:'Bono Boncer TZXO6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:3209,p:5.32},
+      {a:'Lecer X31L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2872,p:4.76},
+      {a:'Bono Boncer TZX26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2851,p:4.73},
+      {a:'Letra Prov Bs As PBA27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2614,p:4.34},
+      {a:'Bono Boncer TZXD6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2032,p:3.37},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:2000,p:3.32},
+      {a:'FF Mercado Credito 44 CA',cl:'VIC',sub:'FF',m:'ARS',v:1980,p:3.28},
+      {a:'Cheque MAV070801278',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:1925,p:3.19},
+      {a:'Cheque MAV070801279',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:1925,p:3.19},
+      {a:'ON Santander Rio S 31',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:1867,p:3.10},
+      {a:'Bono Dual TTS26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1793,p:2.97},
+      {a:'FF Megabono 337 Clase A',cl:'VIC',sub:'FF',m:'ARS',v:1692,p:2.81},
+      {a:'Boncer Mendoza C1',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1638,p:2.72},
+      {a:'ON BBVA Frances Cl 47',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:1541,p:2.56},
+      {a:'ON Mercado Pago C5',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:1529,p:2.54},
+      {a:'ON Banco Galicia BYY1O',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:1508,p:2.50},
+      {a:'ON ICBC Clase 5',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:1203,p:1.99},
+      {a:'Fut Reg ARS (cobertura)',cl:'Derivados',sub:'Futuro',m:'ARS',v:5470,p:9.07},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:3309,p:5.49},
+    ]
+  },
+  {
+    name:'1822 Raíces Ahorro Plus', tipo:'RF ARS Lecap', tab:'lecap', acc:'var(--blue)', chipCls:'c-lecap',
+    total:24364, moneda:'ARS',
+    by_clase:{'Derivados':1975,'Disponibilidades':1,'Títulos de Deuda':21619,'VIC':769},
+    holdings:[
+      {a:'Lecap S15S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:4157,p:18.58},
+      {a:'Lecap S30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2903,p:12.97},
+      {a:'Lecap S14G6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2031,p:9.08},
+      {a:'Cheque MAV070801280',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:1925,p:8.60},
+      {a:'Lelink D30S6 (Dollar-Linked)',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:1840,p:8.22},
+      {a:'Bono Dual TTJ26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1550,p:6.93},
+      {a:'Lecap S17L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1314,p:5.87},
+      {a:'Cheque MAV160601351',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:996,p:4.45},
+      {a:'Lecap S31L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:934,p:4.18},
+      {a:'Letra Tesoro Nac T30A7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:877,p:3.92},
+      {a:'Bono Boncer TZX26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:821,p:3.67},
+      {a:'Bono Dual TTS26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:805,p:3.60},
+      {a:'FCI Fima Premium Clase B',cl:'VIC',sub:'FCI',m:'ARS',v:769,p:3.44},
+      {a:'Bono Boncer TX26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:740,p:3.31},
+      {a:'Lecer X30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:727,p:3.25},
+      {a:'Fut Reg ARS (cobertura)',cl:'Derivados',sub:'Futuro',m:'ARS',v:1975,p:8.83},
+    ]
+  },
+  // RF ARS CER
+  {
+    name:'1810 Ahorros Activos', tipo:'RF ARS CER', tab:'cer', acc:'var(--green)', chipCls:'c-cer',
+    total:116627, moneda:'ARS',
+    by_clase:{'Disponibilidades':10,'Op. a Plazo':4565,'Títulos de Deuda':112051},
+    holdings:[
+      {a:'Bono Boncer TZXD7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:27069,p:24.03},
+      {a:'Bono Boncer TZXS7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:26370,p:23.41},
+      {a:'Bono Boncer TZX28',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:23842,p:21.16},
+      {a:'Bono Boncer TZXS8',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:9721,p:8.63},
+      {a:'Bono Boncer 2028 TZXM8',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:8528,p:7.57},
+      {a:'Bono CER TZX27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:6781,p:6.02},
+      {a:'Bono Boncer 2027 TZXM7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:6234,p:5.53},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:4565,p:4.05},
+      {a:'Boncer TZXY7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:3506,p:3.11},
+      {a:'Otros A/P (pasivo neto)',cl:'Otros',sub:'',m:'',v:-3971,p:-3.53},
+    ]
+  },
+  {
+    name:'1822 Raíces Inversión', tipo:'RF ARS CER', tab:'cer', acc:'var(--green)', chipCls:'c-cer',
+    total:93998, moneda:'ARS',
+    by_clase:{'Op. a Plazo':2000,'Títulos de Deuda':90042,'VIC':1956},
+    holdings:[
+      {a:'Bono Boncer TZXD6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:7956,p:8.59},
+      {a:'Bono Boncer TZXO6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:6660,p:7.19},
+      {a:'Bono Boncer TX26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:5379,p:5.80},
+      {a:'Bono Boncer TZXD7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:5326,p:5.75},
+      {a:'Bono Boncer TZXS7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:5213,p:5.63},
+      {a:'Lecer X30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:5166,p:5.57},
+      {a:'Bono Prov Cordoba Clase 4',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:5042,p:5.44},
+      {a:'ON Bco Ciudad C23',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:4126,p:4.45},
+      {a:'Bono Boncer TZX28',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:4108,p:4.43},
+      {a:'Lecer X30N6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:4053,p:4.37},
+      {a:'ON Banco Nacion Clase 3',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:4016,p:4.33},
+      {a:'Bono Prov Cordoba Clase 6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:3746,p:4.04},
+      {a:'Letra Prov Bs As PBA28',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:3705,p:4.00},
+      {a:'Bono Dual TXMD9',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:3343,p:3.61},
+      {a:'ON FCA Comp. Finac CL22',cl:'Tít. Deuda',sub:'ON',m:'USD',v:3233,p:3.49},
+      {a:'Bono Boncer TX28',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2731,p:2.95},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:2000,p:2.16},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:4198,p:4.53},
+    ]
+  },
+  // RF MULT
+  {
+    name:'1822 Raíces Valores Fiduciarios', tipo:'RF MULT Disc', tab:'mult', acc:'var(--cyan)', chipCls:'c-mult',
+    total:224774, moneda:'ARS',
+    by_clase:{'Op. a Plazo':9800,'Títulos de Deuda':28652,'VIC':180788,'Otros':5534},
+    holdings:[
+      {a:'FF Mercado Credito 47 CA',cl:'VIC',sub:'FF',m:'ARS',v:13712,p:6.10},
+      {a:'FF Mercado Credito 46 CA',cl:'VIC',sub:'FF',m:'ARS',v:11797,p:5.25},
+      {a:'FF Mercado Credito 48 CA',cl:'VIC',sub:'FF',m:'ARS',v:11669,p:5.19},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:9800,p:4.36},
+      {a:'FF Mercado Credito 49 CA',cl:'VIC',sub:'FF',m:'ARS',v:9612,p:4.28},
+      {a:'FF Mercado Credito 45 CA',cl:'VIC',sub:'FF',m:'ARS',v:9389,p:4.18},
+      {a:'FF Mercado Credito 44 CA',cl:'VIC',sub:'FF',m:'ARS',v:9305,p:4.14},
+      {a:'FF Cuotas Cencosud S57 VDFA',cl:'VIC',sub:'FF',m:'ARS',v:7490,p:3.33},
+      {a:'FF Cuotas Cencosud S56 VDFA',cl:'VIC',sub:'FF',m:'ARS',v:7131,p:3.17},
+      {a:'FF Megabono 345 Clase A',cl:'VIC',sub:'FF',m:'ARS',v:6051,p:2.69},
+      {a:'FF Mercado Credito 43 CA',cl:'VIC',sub:'FF',m:'ARS',v:5973,p:2.66},
+      {a:'FF Megabono 349 Clase A',cl:'VIC',sub:'FF',m:'ARS',v:5439,p:2.42},
+      {a:'FF Megabono 347 Clase A',cl:'VIC',sub:'FF',m:'ARS',v:4684,p:2.08},
+      {a:'FF Creditech S6 CA',cl:'VIC',sub:'FF',m:'ARS',v:4681,p:2.08},
+      {a:'FF AySA S1',cl:'VIC',sub:'FF',m:'ARS',v:4466,p:1.99},
+      {a:'Bono Dual TTS26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:3666,p:1.63},
+      {a:'ON Mercado Pago C1',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:2083,p:0.93},
+      {a:'Bono Boncer TX26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2047,p:0.91},
+      {a:'Otros FF',cl:'VIC',sub:'FF',m:'ARS',v:65557,p:29.17},
+    ]
+  },
+  {
+    name:'1822 Raíces Inversión (T+1)',tipo:'RF MULT Disc', tab:'mult', acc:'var(--cyan)', chipCls:'c-mult',
+    total:93998, moneda:'ARS',
+    by_clase:{'Op. a Plazo':2000,'Títulos de Deuda':90042,'VIC':1956},
+    holdings:[
+      {a:'Bono Boncer TZXD6',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:7956,p:8.59},
+      {a:'Bono Boncer TZXO6',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:6660,p:7.19},
+      {a:'Bono Prov Cordoba Cl4',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:5042,p:5.44},
+      {a:'ON Bco Ciudad C23',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:4126,p:4.45},
+      {a:'ON Banco Nacion Cl3',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:4016,p:4.33},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:66198,p:70.00},
+    ]
+  },
+  {
+    name:'1822 Raíces Gestión', tipo:'RF MULT Disc', tab:'mult', acc:'var(--cyan)', chipCls:'c-mult',
+    total:10713, moneda:'ARS/USD',
+    by_clase:{'Part. Accionaria':4907,'Títulos de Deuda':5745,'VIC':48,'Otros':13},
+    holdings:[
+      {a:'Cedear MSCI Brazil ETF',cl:'Accionario',sub:'Cedear',m:'USD',v:1375,p:12.84},
+      {a:'Bonos Rep Argentina 2030',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:944,p:8.81},
+      {a:'Cedear Vista Oil Gas',cl:'Accionario',sub:'Cedear',m:'ARS',v:660,p:6.16},
+      {a:'Bono del Tesoro Nacional AO28',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:560,p:5.22},
+      {a:'Bono Dual TXMD9',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:532,p:4.96},
+      {a:'Bono Boncer TZX28',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:528,p:4.93},
+      {a:'Bono Dual TXMD8',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:521,p:4.86},
+      {a:'YPF - D',cl:'Accionario',sub:'Acción',m:'ARS',v:460,p:4.29},
+      {a:'Bono Boncer TZXD6',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:407,p:3.80},
+      {a:'Bonos Rep Argentina GD35',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:332,p:3.10},
+      {a:'Grupo Fciero Galicia - B',cl:'Accionario',sub:'Acción',m:'ARS',v:329,p:3.07},
+      {a:'ON Vista Gas y Oil C29',cl:'Tít. Deuda',sub:'ON',m:'USD',v:326,p:3.04},
+      {a:'Cedear Mercado Libre',cl:'Accionario',sub:'Cedear',m:'ARS',v:319,p:2.98},
+      {a:'Bonos Rep Argentina GD41',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:310,p:2.89},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:2411,p:22.51},
+    ]
+  },
+  // RF USD
+  {
+    name:'1810 Renta Dólar', tipo:'RF USD Disc', tab:'rfusd', acc:'var(--purple)', chipCls:'c-usd',
+    total:103880, moneda:'USD',
+    by_clase:{'Disponib.':15,'Op. a Plazo':18271,'Títulos de Deuda':85594},
+    holdings:[
+      {a:'Caucion Colocadora U$S Merval',cl:'Op. Plazo',sub:'Caución',m:'USD',v:16050,p:15.49},
+      {a:'ON YPF Clase 42',cl:'Tít. Deuda',sub:'ON',m:'USD',v:8192,p:7.91},
+      {a:'ON Pampa Energia C27',cl:'Tít. Deuda',sub:'ON',m:'USD',v:7470,p:7.21},
+      {a:'ON Pluspetrol Clase 6',cl:'Tít. Deuda',sub:'ON',m:'USD',v:5824,p:5.62},
+      {a:'ON Oldelval Clase 7',cl:'Tít. Deuda',sub:'ON',m:'USD',v:5720,p:5.52},
+      {a:'ON YPF Clase 38',cl:'Tít. Deuda',sub:'ON',m:'USD',v:5164,p:4.99},
+      {a:'ON Supervielle Clase V',cl:'Tít. Deuda',sub:'ON',m:'USD',v:4659,p:4.50},
+      {a:'ON Tecpetrol C12',cl:'Tít. Deuda',sub:'ON',m:'USD',v:4535,p:4.38},
+      {a:'ON BBVA Frances Cl 44',cl:'Tít. Deuda',sub:'ON',m:'USD',v:4439,p:4.29},
+      {a:'ON YPF Clase 43',cl:'Tít. Deuda',sub:'ON',m:'USD',v:4434,p:4.28},
+      {a:'ON Tecpetrol C11',cl:'Tít. Deuda',sub:'ON',m:'USD',v:3013,p:2.91},
+      {a:'ON BBVA Frances Cl 40',cl:'Tít. Deuda',sub:'ON',m:'USD',v:2098,p:2.03},
+      {a:'ON Pan American C35',cl:'Tít. Deuda',sub:'ON',m:'USD',v:2074,p:2.00},
+      {a:'ON Oldelval Clase 5',cl:'Tít. Deuda',sub:'ON',m:'USD',v:2018,p:1.95},
+      {a:'ON Otamerica S6',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1987,p:1.92},
+      {a:'ON YPF Luz C23',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1595,p:1.54},
+      {a:'ON Vista Gas y Oil C29',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1526,p:1.47},
+      {a:'ON Banco Hipotecario C14',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1494,p:1.44},
+      {a:'ON Banco Galicia BYY2O',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1478,p:1.43},
+      {a:'Otros ONs',cl:'Tít. Deuda',sub:'ON',m:'USD',v:11610,p:11.18},
+    ]
+  },
+  {
+    name:'1822 Raíces Dólares Plus', tipo:'RF USD Disc', tab:'rfusd', acc:'var(--purple)', chipCls:'c-usd',
+    total:59310, moneda:'USD',
+    by_clase:{'Disponib.':758,'Op. a Plazo':3799,'Títulos de Deuda':54651,'VIC':103},
+    holdings:[
+      {a:'Bonos Rep Argentina 2030',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:6693,p:11.30},
+      {a:'Caucion Colocadora U$S BYMA',cl:'Op. Plazo',sub:'Caución',m:'USD',v:3799,p:6.41},
+      {a:'Bono Bopreal 2028 S4 Cl B',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:3766,p:6.36},
+      {a:'Bonos Rep Argentina GD35',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:3583,p:6.05},
+      {a:'Bono del Tesoro Nacional AO27',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:3416,p:5.77},
+      {a:'Bonos Rep Argentina GD38',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:3373,p:5.69},
+      {a:'Bonos Rep Argentina GD41',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:3329,p:5.62},
+      {a:'Bono del Tesoro Nacional AO28',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:2742,p:4.63},
+      {a:'Bono Prov Neuquen 2025',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:2610,p:4.41},
+      {a:'Bono Prov Mendoza 2029',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:2408,p:4.07},
+      {a:'ON YPF Clase 31',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1644,p:2.78},
+      {a:'ON Pampa Energia C21',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1617,p:2.73},
+      {a:'Bono Prov Cordoba 2029',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:1584,p:2.67},
+      {a:'ON Tecpetrol C13',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1484,p:2.50},
+      {a:'ON Banco Comafi C24',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1480,p:2.50},
+      {a:'ON Banco Galicia BYY2O',cl:'Tít. Deuda',sub:'ON',m:'USD',v:1332,p:2.25},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:8180,p:13.79},
+    ]
+  },
+  {
+    name:'1822 Raíces Renta en Dólares', tipo:'RF USD Disc', tab:'rfusd', acc:'var(--purple)', chipCls:'c-usd',
+    total:9648, moneda:'USD',
+    by_clase:{'Disponib.':8,'Op. a Plazo':451,'Títulos de Deuda':9190},
+    holdings:[
+      {a:'ON Banco Hipotecario C14',cl:'Tít. Deuda',sub:'ON',m:'USD',v:899,p:9.33},
+      {a:'ON Banco Galicia BYY2O',cl:'Tít. Deuda',sub:'ON',m:'USD',v:888,p:9.22},
+      {a:'ON Pan American C42',cl:'Tít. Deuda',sub:'ON',m:'USD',v:763,p:7.92},
+      {a:'ON Otamerica S5',cl:'Tít. Deuda',sub:'ON',m:'USD',v:759,p:7.88},
+      {a:'ON BBVA Frances Cl 40',cl:'Tít. Deuda',sub:'ON',m:'USD',v:742,p:7.70},
+      {a:'ON Plaza Logistica C15',cl:'Tít. Deuda',sub:'ON',m:'USD',v:741,p:7.70},
+      {a:'ON Pecom C2',cl:'Tít. Deuda',sub:'ON',m:'USD',v:739,p:7.67},
+      {a:'ON Pluspetrol Clase 3',cl:'Tít. Deuda',sub:'ON',m:'USD',v:627,p:6.51},
+      {a:'ON YPF Clase 37',cl:'Tít. Deuda',sub:'ON',m:'USD',v:614,p:6.38},
+      {a:'ON Tecpetrol C11',cl:'Tít. Deuda',sub:'ON',m:'USD',v:599,p:6.22},
+      {a:'ON Pampa Energia C25',cl:'Tít. Deuda',sub:'ON',m:'USD',v:474,p:4.92},
+      {a:'Caucion Colocadora U$S BYMA',cl:'Op. Plazo',sub:'Caución',m:'USD',v:451,p:4.68},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:1352,p:14.01},
+    ]
+  },
+  {
+    name:'1822 Raíces RF Internacional', tipo:'RF USD Disc', tab:'rfusd', acc:'var(--purple)', chipCls:'c-usd',
+    total:3791, moneda:'USD',
+    by_clase:{'Disponib.':110,'Op. a Plazo':717,'Títulos de Deuda':2964},
+    holdings:[
+      {a:'Caucion Colocadora U$S BYMA',cl:'Op. Plazo',sub:'Caución',m:'USD',v:717,p:18.94},
+      {a:'BC Codelco 5.125%',cl:'Tít. Deuda',sub:'Corp. Internacional',m:'USD',v:617,p:16.30},
+      {a:'US Treasury Bill 310527',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:592,p:15.63},
+      {a:'BC Cencosud 5.95%',cl:'Tít. Deuda',sub:'Corp. Internacional',m:'USD',v:461,p:12.18},
+      {a:'BC Banco do Brasil 2029',cl:'Tít. Deuda',sub:'Corp. Internacional',m:'USD',v:453,p:11.96},
+      {a:'BC Vale Overseas Ltd 3.75%',cl:'Tít. Deuda',sub:'Corp. Internacional',m:'USD',v:432,p:11.42},
+      {a:'BC Falabella 150132',cl:'Tít. Deuda',sub:'Corp. Internacional',m:'USD',v:410,p:10.83},
+      {a:'Cta Cte U$S Bco Prov BA',cl:'Disponib.',sub:'Cta Corriente',m:'USD',v:110,p:2.92},
+    ]
+  },
+  {
+    name:'1810 Renta Fija Argentina', tipo:'RF ARG Multi', tab:'rfusd', acc:'#6ee7b7', chipCls:'c-arg',
+    total:13613, moneda:'ARS/USD',
+    by_clase:{'Disponib.':17,'Op. a Plazo':93,'Títulos de Deuda':13504},
+    holdings:[
+      {a:'Bono Tesoro Nacional TZV26 (DL)',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:2511,p:18.50},
+      {a:'Lelink D30S6 (Dollar-Linked)',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:2484,p:18.30},
+      {a:'Bono Boncer 2027 TZXM7 (CER)',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2422,p:17.85},
+      {a:'Bono Tesoro Nacional TZV27 (DL)',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:1861,p:13.71},
+      {a:'Bono Prov BA TZV28 (DL)',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:1062,p:7.82},
+      {a:'Bono CER TZX27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:936,p:6.90},
+      {a:'Lecap S15S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:812,p:5.98},
+      {a:'Bono Boncer TZXS7',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:515,p:3.79},
+      {a:'Lecap S17L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:398,p:2.93},
+      {a:'Lecap S14G6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:261,p:1.92},
+      {a:'Bonos Rep Argentina GD35',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:243,p:1.79},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:93,p:0.69},
+    ]
+  },
+  // RV
+  {
+    name:'1822 Raíces Valores Negociables', tipo:'Renta Variable', tab:'rv', acc:'var(--orange)', chipCls:'c-rv',
+    total:45249, moneda:'ARS',
+    by_clase:{'Disponib.':0,'Part. Accionaria':44845,'VIC':403},
+    holdings:[
+      {a:'YPF - D',cl:'Accionario',sub:'Acción',m:'ARS',v:8232,p:18.31},
+      {a:'Grupo Fciero Galicia - B',cl:'Accionario',sub:'Acción',m:'ARS',v:7011,p:15.60},
+      {a:'Pampa Energia',cl:'Accionario',sub:'Acción',m:'ARS',v:4921,p:10.95},
+      {a:'Banco Macro Bansud - B',cl:'Accionario',sub:'Acción',m:'ARS',v:4411,p:9.81},
+      {a:'Central Puerto',cl:'Accionario',sub:'Acción',m:'ARS',v:3139,p:6.98},
+      {a:'BBVA Argentina',cl:'Accionario',sub:'Acción',m:'ARS',v:2817,p:6.27},
+      {a:'BYMA',cl:'Accionario',sub:'Acción',m:'ARS',v:2179,p:4.85},
+      {a:'Transp Gas del Sur - B',cl:'Accionario',sub:'Acción',m:'ARS',v:2089,p:4.65},
+      {a:'Ternium - A',cl:'Accionario',sub:'Acción',m:'ARS',v:1586,p:3.53},
+      {a:'Loma Negra',cl:'Accionario',sub:'Acción',m:'ARS',v:1445,p:3.22},
+      {a:'Grupo Supervielle CB',cl:'Accionario',sub:'Acción',m:'ARS',v:1186,p:2.64},
+      {a:'Aluar',cl:'Accionario',sub:'Acción',m:'ARS',v:1058,p:2.35},
+      {a:'Cresud',cl:'Accionario',sub:'Acción',m:'ARS',v:1005,p:2.24},
+      {a:'Banco de Valores',cl:'Accionario',sub:'Acción',m:'ARS',v:845,p:1.88},
+      {a:'Otros',cl:'Accionario',sub:'Acción',m:'ARS',v:2878,p:6.38},
+    ]
+  },
+  {
+    name:'1810 Renta Variable Argentina', tipo:'Renta Variable', tab:'rv', acc:'var(--orange)', chipCls:'c-rv',
+    total:38511, moneda:'ARS',
+    by_clase:{'Disponib.':11,'Op. a Plazo':200,'Part. Accionaria':38300},
+    holdings:[
+      {a:'YPF - D',cl:'Accionario',sub:'Acción',m:'ARS',v:7589,p:19.86},
+      {a:'Grupo Fciero Galicia - B',cl:'Accionario',sub:'Acción',m:'ARS',v:6922,p:18.11},
+      {a:'Pampa Energia',cl:'Accionario',sub:'Acción',m:'ARS',v:5189,p:13.58},
+      {a:'Banco Macro Bansud - B',cl:'Accionario',sub:'Acción',m:'ARS',v:3365,p:8.80},
+      {a:'BBVA Argentina',cl:'Accionario',sub:'Acción',m:'ARS',v:1988,p:5.20},
+      {a:'Central Puerto',cl:'Accionario',sub:'Acción',m:'ARS',v:1671,p:4.37},
+      {a:'Transp Gas del Sur - B',cl:'Accionario',sub:'Acción',m:'ARS',v:1629,p:4.26},
+      {a:'BYMA',cl:'Accionario',sub:'Acción',m:'ARS',v:1516,p:3.97},
+      {a:'Ternium - A',cl:'Accionario',sub:'Acción',m:'ARS',v:1270,p:3.32},
+      {a:'Cedear Vista Oil Gas',cl:'Accionario',sub:'Cedear',m:'ARS',v:1238,p:3.24},
+      {a:'Loma Negra',cl:'Accionario',sub:'Acción',m:'ARS',v:1031,p:2.70},
+      {a:'Grupo Supervielle CB',cl:'Accionario',sub:'Acción',m:'ARS',v:819,p:2.14},
+      {a:'Aluar',cl:'Accionario',sub:'Acción',m:'ARS',v:810,p:2.12},
+      {a:'Transener - B',cl:'Accionario',sub:'Acción',m:'ARS',v:653,p:1.71},
+      {a:'Otros',cl:'Accionario',sub:'Acción',m:'ARS',v:3122,p:8.10},
+    ]
+  },
+  // RM
+  {
+    name:'1810 Renta Mixta', tipo:'Renta Mixta', tab:'rm', acc:'var(--pink)', chipCls:'c-rm',
+    total:13426, moneda:'ARS',
+    by_clase:{'Disponib.':11,'Op. a Plazo':104,'Part. Accionaria':3189,'Títulos de Deuda':10122},
+    holdings:[
+      {a:'Bono Boncer 2028 TZXM8',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:3160,p:23.57},
+      {a:'Bono Boncer TZXS8',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:1783,p:13.30},
+      {a:'Bono Boncer TZXS7',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:1438,p:10.72},
+      {a:'YPF - D',cl:'Accionario',sub:'Acción',m:'ARS',v:1152,p:8.59},
+      {a:'Letra Tamar TEM M31G6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1084,p:8.08},
+      {a:'Pampa Energia',cl:'Accionario',sub:'Acción',m:'ARS',v:787,p:5.87},
+      {a:'Bonos Rep Argentina GD30',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:775,p:5.78},
+      {a:'Letra Tamar TEM TMF27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:692,p:5.16},
+      {a:'Banco Macro Bansud - B',cl:'Accionario',sub:'Acción',m:'ARS',v:664,p:4.95},
+      {a:'Grupo Fciero Galicia - B',cl:'Accionario',sub:'Acción',m:'ARS',v:586,p:4.37},
+      {a:'Bono Disc ARS DICP',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:557,p:4.16},
+      {a:'Lecap S30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:397,p:2.96},
+      {a:'Bonos Rep Argentina GD35',cl:'Tít. Deuda',sub:'Tít. Público',m:'USD',v:122,p:0.91},
+      {a:'Bono Boncer 2027 TZXM7',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:114,p:0.85},
+      {a:'Caucion Colocadora $ BYMA',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:104,p:0.78},
+    ]
+  },
+  // PYME
+  {
+    name:'1822 Raíces Abierto Pymes', tipo:'PyMEs', tab:'pyme', acc:'var(--red)', chipCls:'c-pyme',
+    total:36345, moneda:'ARS/USD',
+    by_clase:{'Títulos de Deuda':30142,'VIC':5679,'Otros':524},
+    holdings:[
+      {a:'Lecap T30J6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:2486,p:6.84},
+      {a:'Bono Dual TTJ26',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1688,p:4.64},
+      {a:'Lecap S17L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1484,p:4.08},
+      {a:'ON Pyme Gar Venturino S2',cl:'Tít. Deuda',sub:'ON PyME',m:'USD',v:1308,p:3.60},
+      {a:'FF Grancoop Creditos S4 CA',cl:'VIC',sub:'FF',m:'ARS',v:929,p:2.56},
+      {a:'ON C&C Medicals S2',cl:'Tít. Deuda',sub:'ON PyME',m:'ARS',v:929,p:2.56},
+      {a:'ON Peduzzi S1',cl:'Tít. Deuda',sub:'ON PyME',m:'ARS',v:904,p:2.49},
+      {a:'FF Secubono S246 Clase A',cl:'VIC',sub:'FF',m:'ARS',v:900,p:2.48},
+      {a:'FF Venturino S1 A',cl:'VIC',sub:'FF',m:'USD',v:870,p:2.39},
+      {a:'ON Agronorte Serie 1',cl:'Tít. Deuda',sub:'ON PyME',m:'USD',v:866,p:2.38},
+      {a:'ON Del Fabro Hnos S1',cl:'Tít. Deuda',sub:'ON PyME',m:'USD',v:859,p:2.36},
+      {a:'ON BI Georgalos S1 C1',cl:'Tít. Deuda',sub:'ON PyME',m:'ARS',v:816,p:2.25},
+      {a:'ON Grz Georgalos S2 C2',cl:'Tít. Deuda',sub:'ON PyME',m:'USD',v:740,p:2.04},
+      {a:'Lecer X30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:712,p:1.96},
+      {a:'Bono Boncer TX26',cl:'Tít. Deuda',sub:'CER',m:'ARS',v:706,p:1.94},
+      {a:'ON Pyme Tostex S1',cl:'Tít. Deuda',sub:'ON PyME',m:'ARS',v:702,p:1.93},
+      {a:'ON Pyme Gar Bajo Imp Apache S1',cl:'Tít. Deuda',sub:'ON PyME',m:'USD',v:657,p:1.81},
+      {a:'FF Comafi Leasing 17 Cl A',cl:'VIC',sub:'FF',m:'ARS',v:649,p:1.79},
+      {a:'Otros cheques y ONs PyME',cl:'Varios',sub:'',m:'',v:15390,p:42.35},
+    ]
+  },
+  {
+    name:'Abierto Momentum Pymes', tipo:'PyMEs', tab:'pyme', acc:'var(--red)', chipCls:'c-pyme',
+    total:8645, moneda:'ARS',
+    by_clase:{'Derivados':2204,'Disponib.':1,'Op. a Plazo':3644,'Títulos de Deuda':2796},
+    holdings:[
+      {a:'Caucion Colocadora $ Merval',cl:'Op. Plazo',sub:'Caución',m:'ARS',v:3644,p:42.15},
+      {a:'Fut Reg ARS (cobertura)',cl:'Derivados',sub:'Futuro',m:'ARS',v:2204,p:25.49},
+      {a:'Cheque AFD270600019',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:197,p:2.28},
+      {a:'Cheque FID140700020',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:146,p:1.69},
+      {a:'Cheque FID140700021',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:127,p:1.47},
+      {a:'Otros cheques de pago diferido',cl:'Tít. Deuda',sub:'Cheque Pago Dif.',m:'ARS',v:2327,p:26.92},
+    ]
+  },
+  // INFRA
+  {
+    name:'1822 Raíces Infraestructura', tipo:'Infraestructura', tab:'infra', acc:'#fdba74', chipCls:'c-infra',
+    total:12126, moneda:'ARS/USD',
+    by_clase:{'Títulos de Deuda':11615,'VIC':508,'Otros':3},
+    holdings:[
+      {a:'Lecap S30S6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:1323,p:10.91},
+      {a:'ON Pan American C40',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:1002,p:8.26},
+      {a:'Lecap S17L6',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:737,p:6.08},
+      {a:'ON YPF Clase 30',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:715,p:5.90},
+      {a:'ON Energias Renovables Las Lomas',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:691,p:5.70},
+      {a:'Letra Prov Bs As PBA28',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:653,p:5.38},
+      {a:'Letra Prov Bs As PBA27',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:644,p:5.31},
+      {a:'ON Mega C1',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:607,p:5.00},
+      {a:'ON Vista Gas y Oil Arg C21',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:520,p:4.29},
+      {a:'ON Oiltanking S3',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:505,p:4.16},
+      {a:'ON Edemsa C7',cl:'Tít. Deuda',sub:'ON',m:'ARS',v:489,p:4.03},
+      {a:'Bonos Infra Vial Prov Santa Fe',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:484,p:3.99},
+      {a:'ON Capex C4',cl:'Tít. Deuda',sub:'ON Infraestructura',m:'USD',v:411,p:3.39},
+      {a:'Bono CABA 2028 BDC28',cl:'Tít. Deuda',sub:'Tít. Público',m:'ARS',v:341,p:2.81},
+      {a:'FF Sion Conecta Infraestructura',cl:'VIC',sub:'FF',m:'ARS',v:217,p:1.79},
+      {a:'FCI Fima Premium Clase B',cl:'VIC',sub:'FCI',m:'ARS',v:207,p:1.71},
+      {a:'Otros',cl:'Varios',sub:'',m:'',v:2080,p:17.16},
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+const CLASE_COLORS = {
+  'Disponib.':'#22d3ee','Op. Plazo':'#c9a84c','Tít. Deuda':'#5b9cf6',
+  'Accionario':'#fb923c','VIC':'#a78bfa','Derivados':'#f26969',
+  'Otros':'#4a5568','Part. Accionaria':'#fb923c','Op. a Plazo':'#c9a84c',
+  'Títulos de Deuda':'#5b9cf6'
+};
+
+function fmtM(v) {
+  const av = Math.abs(v);
+  if(av>=1000000) return (v<0?'-':'')+'$'+(av/1000000).toFixed(2)+'T';
+  if(av>=1000) return (v<0?'-':'')+'$'+(av/1000).toFixed(1)+'B';
+  return (v<0?'-':'')+'$'+av.toFixed(0)+'M';
+}
+
+function renderFund(f, accentVar) {
+  const totalAbs = f.holdings.reduce((s,h)=>s+Math.abs(h.v),0);
+  // composition bar
+  const claseMap = {};
+  f.holdings.forEach(h=>{
+    if(!claseMap[h.cl]) claseMap[h.cl]=0;
+    claseMap[h.cl]+=Math.abs(h.v);
+  });
+  const claseTotal = Object.values(claseMap).reduce((s,v)=>s+v,0);
+  const barSegs = Object.entries(claseMap).map(([cl,v])=>{
+    const pct = (v/claseTotal*100).toFixed(1);
+    const col = CLASE_COLORS[cl]||'#555';
+    return `<div class="comp-seg" style="flex:${pct};background:${col}44;border-right:1px solid ${col}" title="${cl}: ${pct}%">
+      ${pct>5?`<span style="color:${col};font-size:9px">${cl}</span>`:''}
+    </div>`;
+  }).join('');
+  const legendItems = Object.entries(claseMap).map(([cl,v])=>{
+    const col = CLASE_COLORS[cl]||'#555';
+    const p = (v/claseTotal*100).toFixed(1);
+    return `<div class="cl-item"><div class="cl-dot" style="background:${col}"></div>${cl} <span style="color:var(--text);margin-left:3px">${p}%</span></div>`;
+  }).join('');
+
+  // moneda chip
+  const monedaCol = f.moneda==='ARS'?'var(--gold)':f.moneda==='USD'?'var(--cyan)':'var(--purple)';
+  const pctTotal = (f.total/TOTAL_AUM*100).toFixed(2);
+
+  // rows
+  const maxV = Math.max(...f.holdings.filter(h=>h.v>0).map(h=>h.v));
+  const rows = f.holdings.map(h=>{
+    const isNeg = h.v<0;
+    const barPct = h.v>0?(h.v/maxV*100).toFixed(1):0;
+    const mCol = h.m==='ARS'?'var(--gold)':h.m==='USD'?'var(--cyan)':h.m==='USL'?'var(--purple)':'var(--muted)';
+    const mBadge = h.m?`<span class="sub-chip" style="color:${mCol};border-color:${mCol}33">${h.m}</span>`:'';
+    return `<tr>
+      <td><div class="td-main">${h.a}</div><div class="td-sub">${h.cl}${h.sub?` · ${h.sub}`:''}</div></td>
+      <td>${mBadge}</td>
+      <td><div class="mini-bar-wrap">
+        <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${barPct}%;background:${accentVar||'var(--gold)'}"></div></div>
+        <div class="mini-bar-val ${isNeg?'neg':''}">${fmtM(h.v)}</div>
+      </div></td>
+      <td class="${isNeg?'neg':''}" style="color:${isNeg?'var(--red)':'var(--text)'}">${h.p.toFixed(2)}%</td>
+    </tr>`;
+  }).join('');
+
+  return `
+  <div class="fund-detail on" data-fund="${f.name}">
+    <div class="fd-header">
+      <div>
+        <div class="fd-name">${f.name}</div>
+        <div class="fd-meta">
+          <span class="chip ${f.chipCls}">${f.tipo}</span>
+          <span class="sub-chip">${f.clasif||f.tipo}</span>
+          <span class="sub-chip" style="color:${monedaCol};border-color:${monedaCol}33">Moneda: ${f.moneda}</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="fd-total" style="color:${accentVar||'var(--gold)'}">${fmtM(f.total)}</div>
+        <div class="fd-pct-total">${pctTotal}% del universo · ${f.holdings.length} posiciones</div>
+      </div>
+    </div>
+    <div class="comp-bar-wrap">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px">COMPOSICIÓN POR CLASE DE ACTIVO</div>
+      <div class="comp-bar">${barSegs}</div>
+      <div class="comp-legend">${legendItems}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="ph-title">Tenencias — ${f.name}</span>
+        <span class="ph-sub">Ordenado por monto · en millones ARS</span>
+      </div>
+      <table class="holdings-tbl">
+        <thead><tr><th>Activo / Instrumento</th><th>Moneda</th><th style="min-width:200px">Monto (M ARS)</th><th>% Fondo</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// Build each tab
+const tabs = {mm:'var(--gold)',lecap:'var(--blue)',cer:'var(--green)',mult:'var(--cyan)',rfusd:'var(--purple)',rv:'var(--orange)',rm:'var(--pink)',pyme:'var(--red)',infra:'#fdba74'};
+
+Object.entries(tabs).forEach(([tabId, acc])=>{
+  const tabFunds = FUNDS.filter(f=>f.tab===tabId);
+  const fsEl = document.getElementById('fs-'+tabId);
+  const fdEl = document.getElementById('fd-'+tabId);
+  if(!fsEl||!fdEl) return;
+
+  tabFunds.forEach((f,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'fs-btn'+(i===0?' on':'');
+    btn.style = `--acc:${acc}`;
+    btn.innerHTML = `${f.name}<span class="amt">${fmtM(f.total)}</span>`;
+    btn.onclick = ()=>{
+      fsEl.querySelectorAll('.fs-btn').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      fdEl.querySelectorAll('.fund-detail').forEach(d=>d.classList.remove('on'));
+      fdEl.querySelector(`[data-fund="${f.name}"]`)?.classList.add('on');
+    };
+    fsEl.appendChild(btn);
+    fdEl.innerHTML += renderFund(f, acc);
+  });
+
+  // show first by default
+  const first = fdEl.querySelector('.fund-detail');
+  if(first) first.classList.add('on');
+});
+
+// ═══════════════════════════════════════════════════════════════
+// ROFEX TAB
+// ═══════════════════════════════════════════════════════════════
+
+// Month label helpers
+const MONTH_NAMES = {
+  '01':'Ene','02':'Feb','03':'Mar','04':'Abr','05':'May','06':'Jun',
+  '07':'Jul','08':'Ago','09':'Sep','10':'Oct','11':'Nov','12':'Dic'
+};
+
+const ROFEX_DATA = {
+  // "Fut Reg ARS" = notional long leg (the asset being hedged)
+  // DLRmmYYYY = short leg (sold futures)
+  funds: [
+    {
+      name: '1822 Raíces Ahorro Plus',
+      tipo: 'RF ARS Lecap',
+      chipCls: 'c-lecap',
+      totalFondo: 24364,
+      positions: [
+        { ticker: 'DLRSPOT', label: 'Fut Reg ARS (posición larga nocional)', dir: 'LONG',  monto: 1975350, pct: 8.83 },
+        { ticker: 'DLR092026', label: 'Fut Rofex DLR092026',                 dir: 'SHORT', monto: -1975350, pct: -8.83 },
+      ]
+    },
+    {
+      name: '1822 Raíces Renta en Pesos',
+      tipo: 'RF ARS Lecap',
+      chipCls: 'c-lecap',
+      totalFondo: 65924,
+      positions: [
+        { ticker: 'DLRSPOT', label: 'Fut Reg ARS (posición larga nocional)', dir: 'LONG',  monto: 5470200, pct: 9.07 },
+        { ticker: 'DLR092026', label: 'Fut Rofex DLR092026',                 dir: 'SHORT', monto: -5470200, pct: -9.07 },
+      ]
+    },
+    {
+      name: 'Abierto Momentum Pymes',
+      tipo: 'PyMEs',
+      chipCls: 'c-pyme',
+      totalFondo: 8645,
+      positions: [
+        { ticker: 'DLRSPOT', label: 'Fut Reg ARS (posición larga nocional)', dir: 'LONG',  monto: 2204300, pct: 25.49 },
+        { ticker: 'DLR062026', label: 'Fut Rofex DLR062026',                 dir: 'SHORT', monto: -396275,  pct: -0.85 },
+        { ticker: 'DLR072026', label: 'Fut Rofex DLR072026',                 dir: 'SHORT', monto: -329850,  pct: -0.71 },
+        { ticker: 'DLR082026', label: 'Fut Rofex DLR082026',                 dir: 'SHORT', monto: -604463,  pct: -1.29 },
+        { ticker: 'DLR092026', label: 'Fut Rofex DLR092026',                 dir: 'SHORT', monto: -873713,  pct: -1.87 },
+      ]
+    }
+  ],
+  // By contract: aggregate across all funds
+  byContract: [
+    { ticker: 'DLR062026', mes: '06', anio: '2026', venc: 'Jun 2026', total: -396275,  fondos: ['Abierto Momentum Pymes'] },
+    { ticker: 'DLR072026', mes: '07', anio: '2026', venc: 'Jul 2026', total: -329850,  fondos: ['Abierto Momentum Pymes'] },
+    { ticker: 'DLR082026', mes: '08', anio: '2026', venc: 'Ago 2026', total: -604463,  fondos: ['Abierto Momentum Pymes'] },
+    { ticker: 'DLR092026', mes: '09', anio: '2026', venc: 'Sep 2026', total: -8319263, fondos: ['1822 Raíces Ahorro Plus','1822 Raíces Renta en Pesos','Abierto Momentum Pymes'] },
+  ]
+};
+
+function buildRofexTab() {
+  const el = document.getElementById('rofex-content');
+  if(!el) return;
+
+  // Total short exposure across all contracts
+  const totalShort = ROFEX_DATA.byContract.reduce((s,c)=>s+c.total, 0);
+  const totalLong  = ROFEX_DATA.funds.reduce((s,f)=>s+f.positions.filter(p=>p.dir==='LONG').reduce((a,p)=>a+p.monto,0),0);
+  const netPos     = totalLong + totalShort; // should be ~0 (hedged)
+
+  // ── HEADER CARDS ──
+  const maxAbsContract = Math.max(...ROFEX_DATA.byContract.map(c=>Math.abs(c.total)));
+
+  const contractCards = ROFEX_DATA.byContract.map(c=>{
+    const barW = (Math.abs(c.total)/maxAbsContract*100).toFixed(1);
+    const fundBadges = c.fondos.map(f=>`<span style="font-size:9px;padding:1px 5px;border-radius:2px;background:var(--s3);color:var(--dim);border:1px solid var(--border);display:inline-block;margin:1px">${f.replace('1822 Raíces ','').replace('1810 ','')}</span>`).join('');
+    const monthLabel = MONTH_NAMES[c.mes]||c.mes;
+    return `
+    <div style="background:var(--s2);border:1px solid var(--border);border-left:3px solid #facc15;border-radius:3px;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:#facc15">${c.ticker}</span>
+        <span style="font-size:10px;color:var(--muted)">Venc. ${c.venc}</span>
+        <span style="background:rgba(242,105,105,.15);border:1px solid rgba(242,105,105,.3);color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 6px;border-radius:2px">VENDIDO</span>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--red)">${fmtM(c.total)}</div>
+      <div style="font-size:9px;color:var(--muted);margin:4px 0 8px">Exposición neta vendida en ARS</div>
+      <div style="height:6px;background:var(--bg);border-radius:2px;overflow:hidden;margin-bottom:8px">
+        <div style="height:100%;width:${barW}%;background:rgba(242,105,105,0.6);border-radius:2px"></div>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">${fundBadges}</div>
+    </div>`;
+  }).join('');
+
+  // ── CURVE VISUAL ──
+  // Show a simple timeline of contracts by maturity
+  const contracts = ROFEX_DATA.byContract;
+  const absMax = Math.max(...contracts.map(c=>Math.abs(c.total)));
+
+  const curveRows = contracts.map(c=>{
+    const barPct = (Math.abs(c.total)/absMax*100).toFixed(1);
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="width:90px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#facc15;flex-shrink:0">${c.ticker}</div>
+      <div style="width:70px;font-size:10px;color:var(--muted);flex-shrink:0">${c.venc}</div>
+      <div style="flex:1;height:20px;background:var(--bg);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${barPct}%;background:linear-gradient(90deg,rgba(242,105,105,0.7),rgba(242,105,105,0.3));border-radius:2px;display:flex;align-items:center;padding-left:6px">
+          <span style="font-size:9px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.7);white-space:nowrap">${fmtM(c.total)}</span>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red);width:80px;text-align:right;flex-shrink:0">${fmtM(c.total)}</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);width:60px;text-align:right;flex-shrink:0">${c.fondos.length} fondo${c.fondos.length>1?'s':''}</div>
+    </div>`;
+  }).join('');
+
+  // ── PER-FUND DETAIL ──
+  const fundRows = ROFEX_DATA.funds.map(f=>{
+    const shortPos = f.positions.filter(p=>p.dir==='SHORT');
+    const longPos  = f.positions.filter(p=>p.dir==='LONG');
+    const netFund  = f.positions.reduce((s,p)=>s+p.monto, 0);
+    const cobertura = longPos.length>0 && shortPos.length>0;
+
+    // coverage ratio
+    const longTotal  = longPos.reduce((s,p)=>s+p.monto,0);
+    const shortTotal = shortPos.reduce((s,p)=>s+Math.abs(p.monto),0);
+    const covPct     = longTotal>0 ? (shortTotal/longTotal*100).toFixed(1) : '—';
+
+    const posRows = f.positions.map(p=>{
+      const isShort = p.dir==='SHORT';
+      const dirBadge = isShort
+        ? `<span style="background:rgba(242,105,105,.15);border:1px solid rgba(242,105,105,.3);color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 6px;border-radius:2px;margin-right:6px">SHORT</span>`
+        : `<span style="background:rgba(62,207,142,.12);border:1px solid rgba(62,207,142,.25);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 6px;border-radius:2px;margin-right:6px">LONG</span>`;
+      const tickerBadge = p.ticker !== 'DLRSPOT'
+        ? `<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#facc15;margin-right:6px">${p.ticker}</span>`
+        : `<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);margin-right:6px">SPOT REF</span>`;
+      return `<tr>
+        <td>${tickerBadge}${dirBadge}</td>
+        <td style="font-size:11px;color:var(--dim)">${p.label}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:right;color:${isShort?'var(--red)':'var(--green)'}">${fmtM(p.monto)}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:right;color:${isShort?'var(--red)':'var(--green)'}">${p.pct.toFixed(2)}%</td>
+      </tr>`;
+    }).join('');
+
+    return `
+    <div class="panel" style="margin-bottom:14px">
+      <div class="panel-hdr">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="ph-title">${f.name}</span>
+          <span class="chip ${f.chipCls}">${f.tipo}</span>
+          ${cobertura?`<span style="background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.25);color:var(--green);font-size:9px;padding:1px 7px;border-radius:2px;font-family:'IBM Plex Mono',monospace">COBERTURA DLR</span>`:''}
+        </div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <span style="font-size:10px;color:var(--muted)">Cobertura: <span style="color:var(--text)">${covPct}%</span></span>
+          <span style="font-size:10px;color:var(--muted)">Neto: <span style="font-family:'IBM Plex Mono',monospace;color:${Math.abs(netFund)<1000?'var(--green)':'var(--yellow)'}">${fmtM(netFund)}</span></span>
+          <span class="ph-sub">Fondo: ${fmtM(f.totalFondo)}</span>
+        </div>
+      </div>
+      <table class="holdings-tbl">
+        <thead><tr><th>Ticker / Dirección</th><th>Instrumento</th><th style="text-align:right">Monto (M ARS)</th><th style="text-align:right">% Fondo</th></tr></thead>
+        <tbody>${posRows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  // ── EXPLANATION BOX ──
+  const explainBox = `
+  <div style="background:rgba(250,204,21,.05);border:1px solid rgba(250,204,21,.2);border-radius:4px;padding:14px 18px;margin-bottom:18px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#facc15;letter-spacing:1px;margin-bottom:8px">CÓMO LEER ESTA SOLAPA</div>
+    <div style="font-size:11px;color:var(--dim);line-height:1.7">
+      Los fondos usan futuros Rofex <strong style="color:var(--text)">DLR+mes+año</strong> como cobertura de tipo de cambio ("Fut Reg ARS" es la posición larga nocional,
+      el DLR vendido es la cobertura corta). La posición neta es siempre cercana a <strong style="color:var(--green)">$0</strong> — el objetivo es neutralizar exposición USD en fondos ARS.<br><br>
+      <strong style="color:var(--text)">SHORT</strong> = futuro vendido (posición corta en dólares = cobertura de apreciación peso)
+      &nbsp;·&nbsp;
+      <strong style="color:var(--text)">LONG</strong> = posición larga nocional (referencia del monto cubierto)
+    </div>
+  </div>`;
+
+  el.innerHTML = `
+  ${explainBox}
+
+  <div style="margin-bottom:6px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">RESUMEN POR CONTRATO</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+    ${contractCards}
+  </div>
+
+  <div class="panel" style="margin-bottom:20px">
+    <div class="panel-hdr">
+      <span class="ph-title">Curva de vencimientos — Posición vendida agregada</span>
+      <span class="ph-sub">Todos los fondos · en millones ARS</span>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:12px;padding:6px 0 10px;border-bottom:1px solid var(--border2);margin-bottom:4px">
+        <div style="width:90px;font-size:9px;letter-spacing:1px;color:var(--muted);font-family:'IBM Plex Mono',monospace">CONTRATO</div>
+        <div style="width:70px;font-size:9px;letter-spacing:1px;color:var(--muted);font-family:'IBM Plex Mono',monospace">VENCIM.</div>
+        <div style="flex:1;font-size:9px;letter-spacing:1px;color:var(--muted);font-family:'IBM Plex Mono',monospace">EXPOSICIÓN VENDIDA</div>
+        <div style="width:80px;font-size:9px;letter-spacing:1px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-align:right">MONTO</div>
+        <div style="width:60px;font-size:9px;letter-spacing:1px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-align:right">FONDOS</div>
+      </div>
+      ${curveRows}
+      <div style="display:flex;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--border)">
+        <div style="text-align:right">
+          <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:2px">TOTAL VENDIDO</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--red)">${fmtM(totalShort)}</div>
+        </div>
+        <div style="width:1px;background:var(--border);margin:0 20px"></div>
+        <div style="text-align:right">
+          <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:2px">TOTAL LONG (nocional)</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--green)">${fmtM(totalLong)}</div>
+        </div>
+        <div style="width:1px;background:var(--border);margin:0 20px"></div>
+        <div style="text-align:right">
+          <div style="font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:2px">POSICIÓN NETA</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:${Math.abs(netPos)<1000?'var(--green)':'var(--yellow)'}">${fmtM(netPos)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:10px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">DETALLE POR FONDO</div>
+  ${fundRows}`;
+}
+
+buildRofexTab();
+
+function switchMain(btn, id){
+  document.querySelectorAll('.mt-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+</script>
+</body>
+</html>
